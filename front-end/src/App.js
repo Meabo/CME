@@ -4,12 +4,14 @@ import './App.css';
 import './bootstrap.min.css'
 import { withWeb3 } from 'react-web3-provider';
 import SweetAlert from 'react-bootstrap-sweetalert';
+import UserPanel from "./components/UserPanel";
 
 class App extends Component
 {
     state = {
-        account: "",
-        alert: null
+        account: null,
+        alert: null,
+        connected: false
     };
 
     getClient_getCurrentAccount = (web3) =>
@@ -104,6 +106,7 @@ class App extends Component
         const {web3} = this.props;
         console.log(web3);
         console.log(e.target);
+        let self = this;
 
         if (window.ethereum)
         {
@@ -111,6 +114,12 @@ class App extends Component
             window.ethereum.enable().then((addresses) =>
             {
                 console.log(addresses);
+                self.setState({
+                        connected:true
+                });
+                self.getClient_CurrentNetwork(web3.eth.givenProvider.networkVersion);
+                self.getClient_getCurrentAccount(web3);
+                web3.currentProvider.publicConfigStore.on('update', self.checkForUpdate);
             });
         }
         else
@@ -123,25 +132,41 @@ class App extends Component
 
 
 
+     connected_state = () =>
+     {
+         if (this.state.account)
+         {
+             return  <div>
+                    <header className="App-header">
+                        <h3 className="text-center text-white">Multis</h3>
+                    </header>
+                    <UserPanel account={this.state.account} connected={this.state.connected}/>
+             </div>;
+         }
+         else
+         {
+             return <div className="App text-center">
+                 <header className="App-header">
+                     <h3 className="text-center text-white">Multis</h3>
+                 </header>
+                 <div className="mt-5 container-fluid">
+                     <img src={logo} className="App-logo" alt="logo" />
 
-  render() {
-    return (
-      <div className="App">
-        <header className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
-            <div>
-                <h3>
-                    Hello {this.state.account}
-                </h3>
-                <button onClick={this.connectToMetaMask}>
-                    Connect your app
-                </button>
-            </div>
-        </header>
+                     <div className="container-fluid">
+                         <button className="mt-5 btn btn-primary" onClick={this.connectToMetaMask}>
+                             Connect your app
+                         </button>
+                     </div>
+                 </div>
+                 {this.state.alert}
+             </div>;
+         }
+     };
 
-          {this.state.alert}
-      </div>
-    );
+
+  render()
+  {
+      return (this.connected_state())
   }
 }
 

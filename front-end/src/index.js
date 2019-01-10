@@ -13,6 +13,7 @@ const deFaultProvider = (cb) =>
 };
 
 ReactDOM.render(
+
     <Web3Provider
         defaultProvider = {deFaultProvider}
         loading="Loading..."
