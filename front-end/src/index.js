@@ -7,12 +7,14 @@ import Web3 from 'web3';
 import Web3Provider from "react-web3-provider";
 
 
+const deFaultProvider = (cb) =>
+{
+    cb(new Web3(new Web3.providers.HttpProvider("http://localhost:8545")));
+};
+
 ReactDOM.render(
     <Web3Provider
-        defaultProvider =
-            {
-                (cb) => cb(new Web3(new Web3.providers.HttpProvider("http://localhost:8545")))
-            }
+        defaultProvider = {deFaultProvider}
         loading="Loading..."
         error={(err) => `Connection error: ${err.message}`}>
         <App />

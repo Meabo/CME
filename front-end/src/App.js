@@ -9,11 +9,10 @@ class App extends Component
 {
     state = {
         account: "",
-        web3: null,
         alert: null
     };
 
-    getCurrentAccount = (web3) =>
+    getClient_getCurrentAccount = (web3) =>
     {
         let self = this;
         web3.eth.getAccounts().then(account =>
@@ -61,7 +60,7 @@ class App extends Component
         });
     }
 
-    getCurrentNetwork = (netId) =>
+    getClient_CurrentNetwork = (netId) =>
     {
             switch (netId)
             {
@@ -100,28 +99,46 @@ class App extends Component
         console.log(event);
     }
 
-
-    async componentDidMount()
+    connectToMetaMask = (e) =>
     {
         const {web3} = this.props;
-        this.getCurrentNetwork(web3.eth.givenProvider.networkVersion);
-        this.getCurrentAccount(web3);
+        console.log(web3);
+        console.log(e.target);
 
-        web3.currentProvider.publicConfigStore.on('update', this.checkForUpdate);
-    }
+        if (window.ethereum)
+        {
+            console.log("Ethereum");
+            window.ethereum.enable().then((addresses) =>
+            {
+                console.log(addresses);
+            });
+        }
+        else
+        {
+            console.log("Metamask")
+        }
+
+
+    };
+
+
+
 
   render() {
     return (
       <div className="App">
         <header className="App-header">
           <img src={logo} className="App-logo" alt="logo" />
-          <h3>
-            Hello {this.state.account}
-          </h3>
-          <button>
-            Create your address
-          </button>
+            <div>
+                <h3>
+                    Hello {this.state.account}
+                </h3>
+                <button onClick={this.connectToMetaMask}>
+                    Connect your app
+                </button>
+            </div>
         </header>
+
           {this.state.alert}
       </div>
     );
