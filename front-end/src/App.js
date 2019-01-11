@@ -153,7 +153,7 @@ class App extends Component
          {
              return <div className="App text-center">
                  <header className="App-header">
-                     <h3 className="text-center text-white">Multis</h3>
+                     <h3 className="text-center text-white">Crypto Management Ethereum</h3>
                  </header>
                  <div className="mt-5 container-fluid">
                      <img src={logo} className="App-logo" alt="logo" />
