@@ -78,7 +78,7 @@ class UserPanel extends Component
     sendWithoutDelay = async() =>
     {
         const {web3} = this.props;
-
+        let self = this;
        await web3.eth.sendTransaction({
             from: this.state.account,
             to: this.state.receiver_address,
@@ -86,14 +86,15 @@ class UserPanel extends Component
         })
             .on('transactionHash', function(hash)
             {
+                self.ShowPopUpSuccess(hash)
 
             })
             .on('receipt', function(receipt)
             {
 
             })
-            .on('confirmation', function(confirmationNumber, receipt){
-
+            .on('confirmation', function(confirmationNumber, receipt)
+            {
             })
             .on('error', console.error); // If a out of gas error, the second parameter is the receipt.
 
@@ -175,9 +176,7 @@ class UserPanel extends Component
 
     render()
     {
-        console.log("Render called");
-
-            return (<Grid>
+         return (<Grid>
                 {this.state.alert}
                 <Row className="show-grid text-center">
                     <Col xs={12} md={12}>
