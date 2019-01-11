@@ -101,7 +101,7 @@ class UserPanel extends Component
 
     async scheduleTransaction(web3, eac)
     {
-        let blockinTheFuture = 20; //this.state.hours * 60 * 4; // 1 minute - 15 secondes par block
+        let blockinTheFuture = this.state.hours * 60 * 4; // 1 minute - 15 secondes par block
         const windowStart = new BigNumber((await web3.eth.getBlockNumber()) + blockinTheFuture);
 
         const receipt = await eac.schedule({
