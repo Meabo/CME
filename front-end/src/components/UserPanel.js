@@ -1,74 +1,222 @@
 import React, {Component} from 'react';
-import CreateSmartContract from "./CreateSmartContract";
-import { Container, Row, Col } from 'reactstrap';
+import {withWeb3} from "react-web3-provider";
+import { EAC } from '@ethereum-alarm-clock/lib';
+import moment from 'moment';
+import SweetAlert from 'react-bootstrap-sweetalert';
+import BigNumber from 'bignumber.js';
+import {Grid, Row, Col} from 'react-bootstrap'
 
 class UserPanel extends Component
 {
+    constructor(props)
+    {
+        super(props);
+        const {web3} = this.props;
+        web3.currentProvider.publicConfigStore.on('update', this.checkForUpdate);
+    }
     state = {
         connected : this.props.connected,
         account: this.props.account,
+        alert: null,
+        balance:'',
         contract_called: false,
-        name: null
+        receiver_address:'',
+        number_of_eth:0,
+        hours:0
     };
 
-    handleClick = () =>
+
+
+    checkForUpdate = (event) =>
     {
-        console.log("clicked");
         this.setState({
-            contract_called: true
+            account: event.selectedAddress
+        })
+    }
+
+
+    hideAlert = () =>
+    {
+        this.setState({
+            alert: null
         });
+    }
+
+    ShowPopUpWarning = () =>
+    {
+        this.setState({ alert:
+                (
+                    <SweetAlert
+                        warning
+                        title="Please Connect to Rinkeby!"
+                        onConfirm={this.hideAlert}
+                    >
+                    </SweetAlert>
+                )
+        });
+    }
+
+    ShowPopUpSuccess = (response) =>
+    {
+        this.setState({ alert:
+                (
+                    <SweetAlert
+                        success
+                        title="Transaction Success"
+                        text={response}
+                        onConfirm={this.hideAlert}>
+
+                    </SweetAlert>
+                )
+        });
+    }
+
+
+    sendWithoutDelay = async() =>
+    {
+        const {web3} = this.props;
+
+       await web3.eth.sendTransaction({
+            from: this.state.account,
+            to: this.state.receiver_address,
+            value:  web3.utils.toWei(this.state.number_of_eth, "ether")
+        })
+            .on('transactionHash', function(hash)
+            {
+
+            })
+            .on('receipt', function(receipt)
+            {
+
+            })
+            .on('confirmation', function(confirmationNumber, receipt){
+
+            })
+            .on('error', console.error); // If a out of gas error, the second parameter is the receipt.
+
     };
 
-    handleChange = ({target}) =>
+    async scheduleTransaction(web3, eac)
     {
-        this.setState({
-            [target.name]: target.value
+        let blockinTheFuture = this.state.hours * 60 * 4; // 1 minute - 15 secondes par block
+        const windowStart = new BigNumber((await web3.eth.getBlockNumber()) + blockinTheFuture);
+
+        const receipt = await eac.schedule({
+            from: this.state.account,
+            toAddress: this.state.receiver_address,
+            timestampScheduling: false,
+            callGas: new BigNumber(1000000),
+            callValue: this.state.number_of_eth * new BigNumber(Math.pow(10, 18)),
+            windowStart
         });
+
+        console.log(receipt);
+
+        if (receipt.status === true)
+        {
+            const scheduledTx = eac.transactionRequestFromReceipt(receipt);
+            await scheduledTx.fillData();
+            console.log(scheduledTx);
+            const response = 'Address of scheduled transaction is:' +  scheduledTx.address + '\n'
+                + 'It is scheduled for: + ' + moment.unix(scheduledTx.windowStart.toNumber()).format();
+            this.ShowPopUpSuccess(response)
+        }
+
+    }
+
+
+    handleSubmit = async(event) =>
+    {
+        event.preventDefault();
+        const {web3} = this.props;
+        const eac = new EAC(web3);
+
+        console.log(typeof this.state.hours);
+        if (this.state.hours > 0) {
+            await this.scheduleTransaction(web3, eac);
+        }
+        else {
+            await this.sendWithoutDelay();
+
+        }
+
     };
+
+
+
+    handleInputChange = (event) =>
+    {
+        event.preventDefault();
+        this.setState(
+            {
+               [event.target.name]: event.target.value
+            });
+
+    };
+
+    async componentDidMount()
+    {
+        const {web3} = this.props;
+        let self = this;
+
+        web3.eth.getBalance(this.props.account).then(balance =>
+        {
+            const balance_eth = web3.utils.fromWei(balance, "ether"); // DEBUG
+            self.setState(
+                {
+                    balance: balance_eth
+                })
+        });
+    }
 
     render()
     {
+        console.log("Render called");
 
-        if (this.state.contract_called === false)
-        {
-            return (
-                <div className="App">
+            return (<Grid>
+                {this.state.alert}
+                <Row className="show-grid text-center">
+                    <Col xs={12} md={12}>
+                        <p> Disclaimer : No timenodes are available on Rinkeby, you'll have to claim your ETH after the delayed time</p>
+                    </Col>
+                </Row>
 
-                    <div className="mt-5 container-fluid">
-                        <h3>
-                            Hello, Your ETH Address is {this.state.account}
-                        </h3>
-                        {this.state.alert}
-                    </div>
+                <Row className="show-grid mt-5">
+                    <Col xs={6} md={6}>
+                        <form onSubmit={this.handleSubmit}>
 
-                    <div className="col-lg-12">
-                        <div className="col-md-4">
-                    <input name="name" type="text" value={this.state.name} onChange={this.handleChange}/>
-                        </div>
-                    <div className="col-md-4">
-                    <CreateSmartContract onCreate={this.handleClick}/>
-                    </div>
-                    </div>
-                </div>);
+                            <p> Receiver's address </p>
+                            <p> <input name='receiver_address' type='text' placeholder='Receiver Address' onChange={this.handleInputChange} /> </p>
+
+                            <p> Amount to send </p>
+                            <p> <input name='number_of_eth' type='number' step="any" placeholder='Amount' min="0" onChange={this.handleInputChange} /> </p>
+
+                            <p> Send Later </p>
+                            <p> <input name='hours' type='number' placeholder='Hours to delay' min="0" onChange={this.handleInputChange} /> </p>
+                            <p> If 0, the transaction will be sent directly </p>
+                            <p><button className="btn btn-secondary mt-2">Create a delayed transaction</button></p>
+                        </form>
+
+                    </Col>
+                    <Col xs={6} md={4}>
+                        <p>Your Account address:</p>
+                        <p className="font-weight-bold">
+                            {this.state.account}
+                        </p>
+
+                        <p>Your Balance address:</p>
+                        <p className="font-weight-bold">
+                            {this.state.balance} ETH
+                        </p>
+                    </Col>
+
+                </Row>
+
+
+            </Grid>);
+
         }
-        else {
-            return (
-                <div className="App">
-                    <header className="App-header">
-                        <h3 className="text-center text-white">Multis</h3>
-                    </header>
-                    <div className="mt-5 container-fluid">
-                        <h3>
-                            Hello, Your ETH Address is {this.state.account}
-                        </h3>
-                        {this.state.alert}
-                    </div>
-
-
-                </div>);
-        }
-    }
 
 }
 
-export default UserPanel;
+export default withWeb3(UserPanel);

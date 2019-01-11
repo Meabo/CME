@@ -1,31 +1,31 @@
 import React, { Component } from 'react';
 import logo from './logo_ethereum.svg';
 import './App.css';
-import './bootstrap.min.css'
+import '../node_modules/bootstrap/dist/css/bootstrap.css';
 import { withWeb3 } from 'react-web3-provider';
 import SweetAlert from 'react-bootstrap-sweetalert';
 import UserPanel from "./components/UserPanel";
+
+
 
 class App extends Component
 {
     state = {
         account: null,
         alert: null,
-        connected: false
+        connected: false,
+        web3:null
     };
 
-    getClient_getCurrentAccount = (web3) =>
+   /* getClient_getCurrentAccount = (web3) =>
     {
         let self = this;
         web3.eth.getAccounts().then(account =>
         {
             console.log(account); // DEBUG
-            self.setState(
-                {
-                    account: account
-                })
+
         })
-    };
+    };*/
 
     hideAlert = () =>
     {
@@ -62,7 +62,7 @@ class App extends Component
         });
     }
 
-    getClient_CurrentNetwork = (netId) =>
+    getClient_getCurrentNetwork = (netId) =>
     {
             switch (netId)
             {
@@ -72,22 +72,21 @@ class App extends Component
                     break;
                 case "2":
                     this.ShowPopUpWarning();
-                    console.log('This is the deprecated Morden test network.')
+                    console.log('This is the deprecated Morden test network.');
                     break;
                 case "3":
                     this.ShowPopUpWarning();
-                    console.log('This is the Ropsten test network.')
+                    console.log('This is the Ropsten test network.');
                     break;
                 case "4":
-                    this.ShowPopUpSuccess();
-                    console.log('This is the Rinkeby test network.')
+                    console.log('This is the Rinkeby test network.');
                     break;
                 case "42":
                     this.ShowPopUpWarning();
-                    console.log('This is the Kovan test network.')
+                    console.log('This is the Kovan test network.');
                     break;
                 default:
-                    console.log('This is an unknown network.')
+                    console.log('This is an unknown network.');
             }
 
     };
@@ -98,14 +97,15 @@ class App extends Component
         this.setState({
             account: event.selectedAddress
         })
-        console.log(event);
     }
 
-    connectToMetaMask = (e) =>
+    connectToMetaMask = () =>
     {
         const {web3} = this.props;
-        console.log(web3);
-        console.log(e.target);
+        this.setState({
+            web3: web3
+        });
+
         let self = this;
 
         if (window.ethereum)
@@ -113,13 +113,20 @@ class App extends Component
             console.log("Ethereum");
             window.ethereum.enable().then((addresses) =>
             {
-                console.log(addresses);
-                self.setState({
+                //console.log(addresses);
+                self.setState(
+                    {
+                        account: addresses[0]
+                    });
+                self.getClient_getCurrentNetwork(web3.eth.givenProvider.networkVersion);
+                //self.getClient_getCurrentAccount(web3);
+                if (web3.eth.givenProvider.networkVersion === "4")
+                {
+                    this.setState({
                         connected:true
-                });
-                self.getClient_CurrentNetwork(web3.eth.givenProvider.networkVersion);
-                self.getClient_getCurrentAccount(web3);
-                web3.currentProvider.publicConfigStore.on('update', self.checkForUpdate);
+                    });
+                }
+                //web3.currentProvider.publicConfigStore.on('update', self.checkForUpdate);
             });
         }
         else
@@ -131,16 +138,15 @@ class App extends Component
     };
 
 
-
      connected_state = () =>
      {
-         if (this.state.account)
+         if (this.state.connected)
          {
-             return  <div>
+             return <div className="App">
                     <header className="App-header">
                         <h3 className="text-center text-white">Multis</h3>
                     </header>
-                    <UserPanel account={this.state.account} connected={this.state.connected}/>
+                    <UserPanel account={this.state.account} connected={this.state.connected} web3={this.state.web3}/>
              </div>;
          }
          else
