@@ -79,10 +79,10 @@ class App extends Component
                     console.log('This is the Ropsten test network.');
                     break;
                 case "4":
+                    this.ShowPopUpWarning();
                     console.log('This is the Rinkeby test network.');
                     break;
                 case "42":
-                    this.ShowPopUpWarning();
                     console.log('This is the Kovan test network.');
                     break;
                 default:
@@ -120,7 +120,7 @@ class App extends Component
                     });
                 self.getClient_getCurrentNetwork(web3.eth.givenProvider.networkVersion);
                 //self.getClient_getCurrentAccount(web3);
-                if (web3.eth.givenProvider.networkVersion === "4")
+                if (web3.eth.givenProvider.networkVersion === "42")
                 {
                     this.setState({
                         connected:true

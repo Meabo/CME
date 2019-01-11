@@ -9,7 +9,7 @@ import Web3Provider from "react-web3-provider";
 
 const deFaultProvider = (cb) =>
 {
-    cb(new Web3(new Web3.providers.HttpProvider("https://rinkeby.infura.io/v3/4cb7de1b186f49f5a300795919445ab0")));
+    cb(new Web3(new Web3.providers.HttpProvider("https://kovan.infura.io/v3/4cb7de1b186f49f5a300795919445ab0")));
 };
 
 ReactDOM.render(

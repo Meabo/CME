@@ -31,7 +31,9 @@ class UserPanel extends Component
     {
         this.setState({
             account: event.selectedAddress
-        })
+        });
+
+        this.getBalance();
     }
 
 
@@ -99,7 +101,7 @@ class UserPanel extends Component
 
     async scheduleTransaction(web3, eac)
     {
-        let blockinTheFuture = this.state.hours * 60 * 4; // 1 minute - 15 secondes par block
+        let blockinTheFuture = 20; //this.state.hours * 60 * 4; // 1 minute - 15 secondes par block
         const windowStart = new BigNumber((await web3.eth.getBlockNumber()) + blockinTheFuture);
 
         const receipt = await eac.schedule({
@@ -154,12 +156,12 @@ class UserPanel extends Component
 
     };
 
-    async componentDidMount()
+    getBalance()
     {
         const {web3} = this.props;
         let self = this;
 
-        web3.eth.getBalance(this.props.account).then(balance =>
+        web3.eth.getBalance(this.state.account).then(balance =>
         {
             const balance_eth = web3.utils.fromWei(balance, "ether"); // DEBUG
             self.setState(
@@ -168,6 +170,8 @@ class UserPanel extends Component
                 })
         });
     }
+
+
 
     render()
     {
