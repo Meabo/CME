@@ -40,9 +40,10 @@ class App extends Component
                 (
                     <SweetAlert
                         warning
-                        title="Please Connect to Rinkeby!"
+                        title="Warning!"
                         onConfirm={this.hideAlert}
                     >
+                        Please connect to Kovan
                     </SweetAlert>
                 )
         });
@@ -144,7 +145,7 @@ class App extends Component
          {
              return <div className="App">
                     <header className="App-header">
-                        <h3 className="text-center text-white">Multis</h3>
+                        <h3 className="text-center text-white">Crypto Management Ethereum</h3>
                     </header>
                     <UserPanel account={this.state.account} connected={this.state.connected} web3={this.state.web3}/>
              </div>;
@@ -154,13 +155,14 @@ class App extends Component
              return <div className="App text-center">
                  <header className="App-header">
                      <h3 className="text-center text-white">Crypto Management Ethereum</h3>
+
                  </header>
                  <div className="mt-5 container-fluid">
                      <img src={logo} className="App-logo" alt="logo" />
 
                      <div className="container-fluid">
                          <button className="mt-5 btn btn-primary" onClick={this.connectToMetaMask}>
-                             Connect your app
+                             Connect on Kovan
                          </button>
                      </div>
                  </div>

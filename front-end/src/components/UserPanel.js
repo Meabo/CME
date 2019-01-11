@@ -181,7 +181,6 @@ class UserPanel extends Component
                 {this.state.alert}
                 <Row className="show-grid text-center">
                     <Col xs={12} md={12}>
-                        <p> Disclaimer : No timenodes are available on Rinkeby, you'll have to claim your ETH after the delayed time</p>
                     </Col>
                 </Row>
 
