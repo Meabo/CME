@@ -63,8 +63,9 @@ class UserPanel extends Component
                     <SweetAlert
                         success
                         title="Transaction Success"
-                        text={response}
                         onConfirm={this.hideAlert}>
+
+                        {response}
 
                     </SweetAlert>
                 )
@@ -117,8 +118,7 @@ class UserPanel extends Component
             const scheduledTx = eac.transactionRequestFromReceipt(receipt);
             await scheduledTx.fillData();
             console.log(scheduledTx);
-            const response = 'Address of scheduled transaction is:' +  scheduledTx.address + '\n'
-                + 'It is scheduled for: + ' + moment.unix(scheduledTx.windowStart.toNumber()).format();
+            const response = 'Address of scheduled transaction is:' +  scheduledTx.address + '\n';
             this.ShowPopUpSuccess(response)
         }
 
