@@ -49,6 +49,21 @@ class App extends Component
         });
     }
 
+    ShowPopUpMetamaskWarning = () =>
+    {
+        this.setState({ alert:
+                (
+                    <SweetAlert
+                        warning
+                        title="Warning!"
+                        onConfirm={this.hideAlert}
+                    >
+                        Seems that you have not Metamask
+                    </SweetAlert>
+                )
+        });
+    };
+
     ShowPopUpSuccess = () =>
     {
         this.setState({ alert:
@@ -132,6 +147,7 @@ class App extends Component
         }
         else
         {
+            this.ShowPopUpMetamaskWarning();
             console.log("Metamask")
         }
 
