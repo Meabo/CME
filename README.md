@@ -10,7 +10,7 @@ v1.0:
 - Detect if user switch network / accounts
 - Warnings raised with SweetAlert if Kovan is not selected.
 - Send Directly or with a delay : both options are possible.
-- Uses eac.js-lib to interact with Smart-contract -> https://github.com/ethereum-alarm-clock/eac.js-lib
+- Uses eac.js-lib to interact with EAC Smart-contracts -> https://github.com/ethereum-alarm-clock/eac.js-lib
 
 TODO:
 - Improvements on the UI (Material-UI)
